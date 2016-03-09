@@ -24,18 +24,37 @@ quicksort [] = []
 quicksort (x:xs) =
   let
     smallerEqual = quicksort [a | a <- xs, a <= x]
-    bigger = quicksort (filter (>x) xs)
+    bigger = quicksort $ filter (>x) xs
   in smallerEqual ++ [x] ++ bigger
 
 
 removeWhite :: String -> String
-removeWhite string = [a | a <- string, not (a `elem` [' '])]
+removeWhite string = [a | a <- string, a `notElem` [' ']]
 
 sortString :: String -> String
-sortString string = removeWhite (quicksort string)
+sortString string = removeWhite $ quicksort string
 
 
 largestDivisible :: (Integral a) => a -> a
 largestDivisible n = head (filter p [100000,99999..])
     where p x = x `mod` n == 0
 
+
+maximum' :: (Ord a) => [a] -> a
+maximum' = foldr1 max
+
+
+appendIfValid :: (a -> Bool) -> a -> [a] -> [a]
+appendIfValid f x xs = if f x then x : xs else xs
+
+
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' p = foldr (appendIfValid p) []
+
+
+sqrtSumsUntil :: Float -> Int
+sqrtSumsUntil n = length (takeWhile (<n) $ scanl1 (+) $ map sqrt [1..]) + 1
+
+
+applyFunctionsToNumber :: Float -> [Float]
+applyFunctionsToNumber n = map ($ n) [(2*), (10*), (^2), sqrt]
