@@ -15,20 +15,27 @@ capitals :: String -> String
 capitals string = [x | x <- string, x `elem` ['A'..'Z']]
 
 
+lowers :: String -> String
+lowers = filter (`elem` ['a'..'z'])
+
+
 quicksort :: (Ord a) => [a] -> [a]
 quicksort [] = []
 quicksort (x:xs) =
   let
     smallerEqual = quicksort [a | a <- xs, a <= x]
-    bigger = quicksort [b | b <- xs, b > x]
+    bigger = quicksort (filter (>x) xs)
   in smallerEqual ++ [x] ++ bigger
 
 
 removeWhite :: String -> String
 removeWhite string = [a | a <- string, not (a `elem` [' '])]
 
-
-
 sortString :: String -> String
 sortString string = removeWhite (quicksort string)
+
+
+largestDivisible :: (Integral a) => a -> a
+largestDivisible n = head (filter p [100000,99999..])
+    where p x = x `mod` n == 0
 
