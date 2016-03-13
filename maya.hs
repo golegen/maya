@@ -25,15 +25,6 @@ isBissextile :: Integer -> Bool
 isBissextile y = y `mod` 4 == 0
 
 
-isBeforeZero :: Integer -> Int -> Int -> Bool
-isBeforeZero y m d = (daysFromZero y m d) < 0
-
-
-isBeforeFirstNull :: Integer -> Int -> Int -> Bool
-isBeforeFirstNull y m d =
-  (< 0) $ (flip diffDays) (fromGregorian 2012 2 29) (fromGregorian y m d)
-
-
 bissextiles :: Integral c => Integer -> c
 bissextiles y =
   floor . (/4) . fromIntegral $ y - yearZero
@@ -49,14 +40,13 @@ adjustBissextiles y m d =
 
 daysFromZeroNoBissextile :: Integer -> Int -> Int -> Integer
 daysFromZeroNoBissextile y m d =
-  daysFromZero y m d + negate (adjustBissextiles y m d)
+  daysFromZero y m d - adjustBissextiles y m d
 
 
 kinByDate :: Integer -> Int -> Int -> Kin
 kinByDate y m d =
   let
     isNullDay = m == 2 && d > 28
-    m' = if isNullDay then 3 else m
-    d' = if isNullDay then 1 else d
+    (m', d') = if isNullDay then (3, 1) else (m, d)
   in
     findKin . (+kinZero) . fromIntegral $ (daysFromZeroNoBissextile y m' d') `mod` 260
