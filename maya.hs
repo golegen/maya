@@ -15,32 +15,32 @@ daysFromZero y m d =
   (flip diffDays) zero $ fromGregorian y m d
 
 
-isPastNullDay :: Int -> Int -> Bool
-isPastNullDay m d
-  | m == 2 = d > 28
-  | otherwise = m > 2
+isBeforeNullDay :: Int -> Int -> Bool
+isBeforeNullDay m d
+  | m == 2 = d <= 28
+  | otherwise = m < 2
 
 
 isBissextile :: Integer -> Bool
 isBissextile y = y `mod` 4 == 0
 
 
-bissextiles :: Integral c => Integer -> c
-bissextiles y =
+pastNullDays :: Integral c => Integer -> c
+pastNullDays y =
   floor . (/4) . fromIntegral $ y - yearZero
 
 
-adjustBissextiles :: Integral a => Integer -> Int -> Int -> a
-adjustBissextiles y m d =
+discountNullDays :: Integral a => Integer -> Int -> Int -> a
+discountNullDays y m d =
   let
-    adjust = if isBissextile y && not (isPastNullDay m d) then - 1 else 0
+    adjust = if isBissextile y && isBeforeNullDay m d then - 1 else 0
   in
-    bissextiles y + adjust
+    pastNullDays y + adjust
 
 
-daysFromZeroNoBissextile :: Integer -> Int -> Int -> Integer
-daysFromZeroNoBissextile y m d =
-  daysFromZero y m d - adjustBissextiles y m d
+daysFromZeroNoNullDays :: Integer -> Int -> Int -> Integer
+daysFromZeroNoNullDays y m d =
+  daysFromZero y m d - discountNullDays y m d
 
 
 kinByDate :: Integer -> Int -> Int -> Kin
@@ -49,4 +49,5 @@ kinByDate y m d =
     isNullDay = m == 2 && d > 28
     (m', d') = if isNullDay then (3, 1) else (m, d)
   in
-    findKin . (+kinZero) . fromIntegral $ (daysFromZeroNoBissextile y m' d') `mod` 260
+    findKin . (+kinZero) . fromIntegral
+    . (flip mod) 260 $ daysFromZeroNoNullDays y m' d'
