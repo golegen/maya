@@ -12,6 +12,7 @@ module Kins
   , findAntipoda
   , findOculto
   , findOndaEncantada
+  , findOndaPosition
   , findFamilia
   , findHarmonic
   , tzolkin
@@ -79,6 +80,7 @@ data Kin = Kin Selo Tom
   deriving (Eq, Show, Read)
 
 
+castle = 52
 selos = [Dragao .. Sol]
 tons = [Magnetico .. Cosmico]
 cores = [Vermelho .. Amarelo]
@@ -154,7 +156,7 @@ findGuia (Kin selo tom) =
     kinI = kinIndex (Kin selo tom)
     factorList = [1, 2, 3, 4, 0]
   in
-    findKin . (+kinI) . (*52) $ factorList !!? tomDots
+    findKin . (+kinI) . (*castle) $ factorList !!? tomDots
 
 
 findAnalogo :: Kin -> Kin

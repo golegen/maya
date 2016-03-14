@@ -49,8 +49,7 @@ kinByDate y m d =
     isNullDay = m == 2 && d > 28
     (m', d') = if isNullDay then (3, 1) else (m, d)
   in
-    findKin . (+kinZero) . fromIntegral
-    . (flip mod) 260 $ daysFromZeroNoNullDays y m' d'
+    findKin . (+kinZero) . fromIntegral $ daysFromZeroNoNullDays y m' d'
 
 
 harmonicByDates :: [(Integer, Int, Int)] -> Kin
