@@ -25,12 +25,12 @@ isBissextile :: Integer -> Bool
 isBissextile y = y `mod` 4 == 0
 
 
-pastNullDays :: Integral c => Integer -> c
+pastNullDays :: Integer -> Integer
 pastNullDays y =
   floor . (/4) . fromIntegral $ y - yearZero
 
 
-discountNullDays :: Integral a => Integer -> Int -> Int -> a
+discountNullDays :: Integer -> Int -> Int -> Integer
 discountNullDays y m d =
   let
     adjust = if isBissextile y && isBeforeNullDay m d then - 1 else 0
