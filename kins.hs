@@ -106,6 +106,11 @@ tzolkin =
     map findKin [1..tzolkinLength]
 
 
+ondasEncantadas :: [Kin]
+ondasEncantadas =
+  filter (\(Kin _ tom _) -> tom == Magnetico) tzolkin
+
+
 seloIndex :: Selo -> Int
 seloIndex selo =
   succ $ selos !!? selo
@@ -193,6 +198,22 @@ findOndaEncantada (Kin selo tom cor) =
     tomI = tomIndex $ tom
   in
     findKin $ index - (tomI - 1)
+
+
+findOndaPosition :: Selo -> Int
+findOndaPosition selo =
+  let
+    (Kin _ _ cor) = findSeloDiff (0+) selo
+  in
+    succ $ ondasEncantadas !!? Kin selo Magnetico cor
+
+
+findFamilia :: Kin -> [(Selo, Cor)]
+findFamilia (Kin selo _ cor) =
+  let
+    rest = (flip mod) 5 $ seloIndex selo
+  in
+    map (\x -> (findSelo x, findCor x)) [rest,(rest + 5)..(length selos - 1)]
 
 
 seloColor :: Selo -> Cor
