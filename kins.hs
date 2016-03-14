@@ -159,15 +159,20 @@ findGuia (Kin selo tom cor)
 findAnalogo :: Kin -> Kin
 findAnalogo (Kin selo tom cor) =
   let
-    (Kin aSelo _ aCor) = findKin . (19-) $ seloIndex selo
+    (Kin aSelo _ aCor) = findSeloDiff (19-) selo
   in
     (Kin aSelo tom aCor)
+
+
+findSeloDiff :: (Int -> Int) -> Selo -> Kin
+findSeloDiff f selo =
+  findKin . f $ seloIndex selo
 
 
 findAntipoda :: Kin -> Kin
 findAntipoda (Kin selo tom cor) =
   let
-    (Kin aSelo _ aCor) = findKin . (10+) $ seloIndex selo
+    (Kin aSelo _ aCor) = findSeloDiff (10+) selo
   in
     (Kin aSelo tom aCor)
 
@@ -175,7 +180,7 @@ findAntipoda (Kin selo tom cor) =
 findOculto :: Kin -> Kin
 findOculto (Kin selo tom cor) =
   let
-    (Kin oSelo _ oCor) = findKin . (21-) $ seloIndex selo
+    (Kin oSelo _ oCor) = findSeloDiff (21-) selo
     oTom = findTom . (14-) $ tomIndex tom
   in
     (Kin oSelo oTom oCor)
