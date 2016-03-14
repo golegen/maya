@@ -51,3 +51,8 @@ kinByDate y m d =
   in
     findKin . (+kinZero) . fromIntegral
     . (flip mod) 260 $ daysFromZeroNoNullDays y m' d'
+
+
+harmonicByDates :: [(Integer, Int, Int)] -> Kin
+harmonicByDates list =
+  findKin . sum . map kinIndex $ map (\(y, m, d) -> kinByDate y m d) list

@@ -12,6 +12,8 @@ module Kins
   , findAntipoda
   , findOculto
   , findOndaEncantada
+  , findFamilia
+  , findHarmonic
   , tzolkin
   , seloIndex
   , tomIndex
@@ -205,6 +207,11 @@ findFamilia (Kin selo _) =
     rest = (flip mod) 5 $ seloIndex selo
   in
     map (\x -> findSelo x) [rest,(rest + 5)..(length selos - 1)]
+
+
+findHarmonic :: [Int] -> Kin
+findHarmonic list =
+  findKin $ sum list
 
 
 seloColor :: Selo -> Cor
