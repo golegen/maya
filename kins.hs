@@ -8,6 +8,9 @@ module Kins
   , findTom
   , findSelo
   , findGuia
+  , findAnalogo
+  , findAntipoda
+  , findOculto
   , findOndaEncantada
   , tzolkin
   , seloIndex
@@ -17,8 +20,10 @@ module Kins
   , ondaEncantada
   ) where
 
+
 import Data.List
 import Data.Maybe
+
 
 data Selo
   = Dragao
@@ -43,6 +48,7 @@ data Selo
   | Sol
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
+
 data Tom
   = Magnetico
   | Lunar
@@ -59,6 +65,7 @@ data Tom
   | Cosmico
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
+
 data Cor
   = Vermelho
   | Branco
@@ -70,9 +77,11 @@ data Cor
 data Kin = Kin Selo Tom Cor
   deriving (Eq, Show, Read)
 
+
 selos = [Dragao .. Sol]
 tons = [Magnetico .. Cosmico]
 cores = [Vermelho .. Amarelo]
+
 
 (!!<) :: [a] -> Int -> a
 list !!< index =
@@ -145,6 +154,31 @@ findGuia (Kin selo tom cor)
   where
     tomDots = (flip mod) 5 $ tomIndex tom
     kinI = kinIndex (Kin selo tom cor)
+
+
+findAnalogo :: Kin -> Kin
+findAnalogo (Kin selo tom cor) =
+  let
+    (Kin aSelo _ aCor) = findKin . (19-) $ seloIndex selo
+  in
+    (Kin aSelo tom aCor)
+
+
+findAntipoda :: Kin -> Kin
+findAntipoda (Kin selo tom cor) =
+  let
+    (Kin aSelo _ aCor) = findKin . (10+) $ seloIndex selo
+  in
+    (Kin aSelo tom aCor)
+
+
+findOculto :: Kin -> Kin
+findOculto (Kin selo tom cor) =
+  let
+    (Kin oSelo _ oCor) = findKin . (21-) $ seloIndex selo
+    oTom = findTom . (14-) $ tomIndex tom
+  in
+    (Kin oSelo oTom oCor)
 
 
 findOndaEncantada :: Kin -> Kin
