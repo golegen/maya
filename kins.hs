@@ -7,6 +7,7 @@ module Kins
   , findCor
   , findTom
   , findSelo
+  , findGuia
   , findOndaEncantada
   , tzolkin
   , seloIndex
@@ -88,6 +89,34 @@ list !!? el =
   fromMaybe 0 $ el `elemIndex` list
 
 
+tzolkin :: [Kin]
+tzolkin =
+  let
+    tzolkinLength = length tons * length selos
+  in
+    map findKin [1..tzolkinLength]
+
+
+seloIndex :: Selo -> Int
+seloIndex selo =
+  succ $ selos !!? selo
+
+
+tomIndex :: Tom -> Int
+tomIndex tom =
+  succ $ tons !!? tom
+
+
+corIndex :: Cor -> Int
+corIndex cor =
+  succ $ cores !!? cor
+
+
+kinIndex :: Kin -> Int
+kinIndex kin =
+  succ $ tzolkin !!? kin
+
+
 findSelo :: Int -> Selo
 findSelo n =
   selos !!< (n - 1)
@@ -108,41 +137,28 @@ findKin n =
   Kin (findSelo n) (findTom n) (findCor n)
 
 
-tzolkin :: [Kin]
-tzolkin =
-  let
-    tzolkinLength = length tons * length selos
-  in
-    map findKin [1..tzolkinLength]
-
-
-seloIndex :: Selo -> Int
-seloIndex selo =
-  (+1) $ selos !!? selo
-
-
-tomIndex :: Tom -> Int
-tomIndex tom =
-  (+1) $ tons !!? tom
-
-
-corIndex :: Cor -> Int
-corIndex cor =
-  (+1) $ cores !!? cor
-
-
-kinIndex :: Kin -> Int
-kinIndex kin =
-  (+1) $ tzolkin !!? kin
+findGuia :: Kin -> Kin
+findGuia (Kin selo tom cor)
+  | tomDots == 1 = (Kin selo tom cor)
+  | tomDots == 0 = findKin $ kinI + 52 * 4
+  | otherwise = findKin . (+kinI) . (*52) $ tomDots - 1
+  where
+    tomDots = (flip mod) 5 $ tomIndex tom
+    kinI = kinIndex (Kin selo tom cor)
 
 
 findOndaEncantada :: Kin -> Kin
-findOndaEncantada kin =
+findOndaEncantada (Kin selo tom cor) =
   let
-    index = kinIndex kin
-    tom = tomIndex $ findTom index
+    index = kinIndex (Kin selo tom cor)
+    tomI = tomIndex $ tom
   in
-    findKin $ index - (tom - 1)
+    findKin $ index - (tomI - 1)
+
+
+seloColor :: Selo -> Cor
+seloColor selo =
+  findCor . (flip mod) 4 $ seloIndex selo
 
 
 ondaEncantada :: Kin -> [Kin]
