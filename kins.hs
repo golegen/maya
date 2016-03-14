@@ -152,13 +152,13 @@ findKin n =
 
 
 findGuia :: Kin -> Kin
-findGuia (Kin selo tom cor)
-  | tomDots == 1 = (Kin selo tom cor)
-  | tomDots == 0 = findKin $ kinI + 52 * 4
-  | otherwise = findKin . (+kinI) . (*52) $ tomDots - 1
-  where
+findGuia (Kin selo tom cor) =
+  let
     tomDots = (flip mod) 5 $ tomIndex tom
     kinI = kinIndex (Kin selo tom cor)
+    factorList = [1, 2, 3, 4, 0]
+  in
+    findKin . (+kinI) . (*52) $ factorList !!? tomDots
 
 
 findAnalogo :: Kin -> Kin
