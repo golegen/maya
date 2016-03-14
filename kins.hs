@@ -15,7 +15,6 @@ module Kins
   , tzolkin
   , seloIndex
   , tomIndex
-  , corIndex
   , kinIndex
   , ondaEncantada
   ) where
@@ -74,7 +73,7 @@ data Cor
   deriving (Eq, Ord, Show, Read, Bounded, Enum)
 
 
-data Kin = Kin Selo Tom Cor
+data Kin = Kin Selo Tom
   deriving (Eq, Show, Read)
 
 
@@ -108,7 +107,7 @@ tzolkin =
 
 ondasEncantadas :: [Kin]
 ondasEncantadas =
-  filter (\(Kin _ tom _) -> tom == Magnetico) tzolkin
+  filter (\(Kin _ tom) -> tom == Magnetico) tzolkin
 
 
 seloIndex :: Selo -> Int
@@ -119,11 +118,6 @@ seloIndex selo =
 tomIndex :: Tom -> Int
 tomIndex tom =
   succ $ tons !!? tom
-
-
-corIndex :: Cor -> Int
-corIndex cor =
-  succ $ cores !!? cor
 
 
 kinIndex :: Kin -> Int
@@ -148,53 +142,53 @@ findCor n =
 
 findKin :: Int -> Kin
 findKin n =
-  Kin (findSelo n) (findTom n) (findCor n)
+  Kin (findSelo n) (findTom n)
 
 
 findGuia :: Kin -> Kin
-findGuia (Kin selo tom cor) =
+findGuia (Kin selo tom) =
   let
     tomDots = (flip mod) 5 $ tomIndex tom
-    kinI = kinIndex (Kin selo tom cor)
+    kinI = kinIndex (Kin selo tom)
     factorList = [1, 2, 3, 4, 0]
   in
     findKin . (+kinI) . (*52) $ factorList !!? tomDots
 
 
 findAnalogo :: Kin -> Kin
-findAnalogo (Kin selo tom cor) =
+findAnalogo (Kin selo tom) =
   let
-    (Kin aSelo _ aCor) = findSeloDiff (19-) selo
+    aSelo = findSeloDiff (19-) selo
   in
-    (Kin aSelo tom aCor)
+    (Kin aSelo tom)
 
 
-findSeloDiff :: (Int -> Int) -> Selo -> Kin
+findSeloDiff :: (Int -> Int) -> Selo -> Selo
 findSeloDiff f selo =
-  findKin . f $ seloIndex selo
+  findSelo . f $ seloIndex selo
 
 
 findAntipoda :: Kin -> Kin
-findAntipoda (Kin selo tom cor) =
+findAntipoda (Kin selo tom) =
   let
-    (Kin aSelo _ aCor) = findSeloDiff (10+) selo
+    aSelo = findSeloDiff (10+) selo
   in
-    (Kin aSelo tom aCor)
+    (Kin aSelo tom)
 
 
 findOculto :: Kin -> Kin
-findOculto (Kin selo tom cor) =
+findOculto (Kin selo tom) =
   let
-    (Kin oSelo _ oCor) = findSeloDiff (21-) selo
+    oSelo = findSeloDiff (21-) selo
     oTom = findTom . (14-) $ tomIndex tom
   in
-    (Kin oSelo oTom oCor)
+    (Kin oSelo oTom)
 
 
 findOndaEncantada :: Kin -> Kin
-findOndaEncantada (Kin selo tom cor) =
+findOndaEncantada (Kin selo tom) =
   let
-    index = kinIndex (Kin selo tom cor)
+    index = kinIndex (Kin selo tom)
     tomI = tomIndex $ tom
   in
     findKin $ index - (tomI - 1)
@@ -202,23 +196,25 @@ findOndaEncantada (Kin selo tom cor) =
 
 findOndaPosition :: Selo -> Int
 findOndaPosition selo =
-  let
-    (Kin _ _ cor) = findSeloDiff (0+) selo
-  in
-    succ $ ondasEncantadas !!? Kin selo Magnetico cor
+  succ $ ondasEncantadas !!? Kin selo Magnetico
 
 
-findFamilia :: Kin -> [(Selo, Cor)]
-findFamilia (Kin selo _ cor) =
+findFamilia :: Kin -> [Selo]
+findFamilia (Kin selo _) =
   let
     rest = (flip mod) 5 $ seloIndex selo
   in
-    map (\x -> (findSelo x, findCor x)) [rest,(rest + 5)..(length selos - 1)]
+    map (\x -> findSelo x) [rest,(rest + 5)..(length selos - 1)]
 
 
 seloColor :: Selo -> Cor
 seloColor selo =
   findCor . (flip mod) 4 $ seloIndex selo
+
+
+readKin :: Kin -> String
+readKin (Kin selo tom) =
+  show selo ++ " " ++ show tom ++ " " ++ show (seloColor selo)
 
 
 ondaEncantada :: Kin -> [Kin]
