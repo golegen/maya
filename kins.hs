@@ -77,8 +77,10 @@ cores = [Vermelho .. Amarelo]
 list !!< index =
   let
     size = length list
+    i = index `mod` size
+    posInd = if i < 0 then size - i else i
   in
-    (list!!) $ index `mod` size
+    list !! posInd
 
 
 (!!?) :: (Eq a) => [a] -> a -> Int
