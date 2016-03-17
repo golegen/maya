@@ -1,57 +1,63 @@
 module Maya where
 
 import Kins
-import Data.Time
+import Data.Time (Day, diffDays, fromGregorian)
 
-yearZero = 2012
-
-zero :: Day
-zero = fromGregorian yearZero 12 21
+type Date = (Integer, Int, Int)
 
 kinZero = 207 :: Int
-
-daysFromZero :: Integer -> Int -> Int -> Integer
-daysFromZero y m d =
-  (flip diffDays) zero $ fromGregorian y m d
+yearZero = 2012 :: Integer
+zero = fromGregorian yearZero 12 21 :: Day
 
 
-isBeforeNullDay :: Int -> Int -> Bool
-isBeforeNullDay m d
-  | m == 2 = d <= 28
-  | otherwise = m < 2
+daysFromZero :: Date -> Integer
+daysFromZero (y, m, d) =
+  diffDays (fromGregorian y m d) zero
 
 
-isBissextile :: Integer -> Bool
-isBissextile y = y `mod` 4 == 0
+shouldApplyBissestile :: Date -> Bool
+shouldApplyBissestile (y, m, d) =
+  isBissestile && isBeforeNullDay
+  where
+    isBissestile = y `rem` 4 == 0
+    isBeforeNullDay
+      | m == 2 = d <= 28
+      | otherwise = m < 2
 
 
-pastNullDays :: Integer -> Integer
-pastNullDays y =
-  floor . (/4) . fromIntegral $ y - yearZero
+pastNullDays :: Date -> Integer
+pastNullDays (y, _, _) =
+  div (y - yearZero) 4
 
 
-discountNullDays :: Integer -> Int -> Int -> Integer
-discountNullDays y m d =
-  let
-    adjust = if isBissextile y && isBeforeNullDay m d then - 1 else 0
-  in
-    pastNullDays y + adjust
+discountNullDays :: Date -> Integer
+discountNullDays date =
+  pastNullDays date + adjust
+  where
+    adjust
+      | shouldApplyBissestile date = -1
+      | otherwise = 0
 
 
-daysFromZeroNoNullDays :: Integer -> Int -> Int -> Integer
-daysFromZeroNoNullDays y m d =
-  daysFromZero y m d - discountNullDays y m d
+daysFromZeroNoNullDays :: Date -> Integer
+daysFromZeroNoNullDays date =
+  daysFromZero date - discountNullDays date
 
 
-kinByDate :: Integer -> Int -> Int -> Kin
-kinByDate y m d =
-  let
-    isNullDay = m == 2 && d > 28
-    (m', d') = if isNullDay then (3, 1) else (m, d)
-  in
-    findKin . (+kinZero) . fromIntegral $ daysFromZeroNoNullDays y m' d'
+kinIndexByDate :: Date -> Int
+kinIndexByDate (y, m, d) =
+  (+) kinZero . fromIntegral $ daysFromZeroNoNullDays (y, m', d')
+  where
+    (m', d')
+      | m == 2 && d > 28 = (3, 1)
+      | otherwise = (m, d)
 
 
-harmonicByDates :: [(Integer, Int, Int)] -> Kin
+kinByDate :: Date -> Kin
+kinByDate date =
+  findKin $ kinIndexByDate date
+
+
+harmonicByDates :: [Date] -> Kin
 harmonicByDates list =
-  findKin . sum . map kinIndex $ map (\(y, m, d) -> kinByDate y m d) list
+  findKin . sum $ map kinIndexByDate list
